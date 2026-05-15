@@ -83,28 +83,28 @@ MetroMate is our answer: a **full-stack transit intelligence system** that proce
 
 ```mermaid
 graph TD
-    subgraph "Edge Layer"
-        CF[Cloudflare DNS + WAF]
+    subgraph EdgeLayer["Edge Layer"]
+        CF["Cloudflare DNS + WAF"]
     end
 
-    subgraph "Frontend – Vercel Edge"
-        UI[Next.js 15 App Router]
-        SVG[SVG Vector Engine]
-        Motion[Framer Motion]
+    subgraph FrontendLayer["Frontend — Vercel Edge"]
+        UI["Next.js 15 App Router"]
+        SVGEngine["SVG Vector Engine"]
+        Motion["Framer Motion"]
     end
 
-    subgraph "Backend – AWS EC2"
-        Nginx[Nginx Reverse Proxy + SSL]
-        PM2[PM2 Process Manager]
-        API[Express Router Layer]
-        RT[GTFS-RT Protobuf Service]
-        Store[In-Memory Data Store]
+    subgraph BackendLayer["Backend — AWS EC2"]
+        Nginx["Nginx Reverse Proxy + SSL"]
+        PM2["PM2 Process Manager"]
+        API["Express Router Layer"]
+        RT["GTFS-RT Protobuf Service"]
+        Store["In-Memory Data Store"]
     end
 
-    subgraph "Data Artifacts"
-        S3[(S3 – GTFS Backups)]
-        JSON[(Optimized JSON Graphs)]
-        PB[(feed_dump.pb – RT Debug)]
+    subgraph DataLayer["Data Artifacts"]
+        S3[("S3 — GTFS Backups")]
+        JSON[("Optimized JSON Graphs")]
+        PB[("feed_dump.pb — RT Debug")]
     end
 
     CF --> UI
@@ -136,7 +136,7 @@ sequenceDiagram
     Nginx->>Express: Proxied Request
     Express->>GraphStore: dijkstra(from, to, adj)
     GraphStore-->>Express: Path + Time + Interchanges
-    Express-->>Browser: JSON Route Result (< 45ms)
+    Express-->>Browser: JSON Route Result (sub-50ms)
 
     Browser->>Nginx: GET /api/metro/live-status
     Nginx->>Express: Route
@@ -155,15 +155,15 @@ Raw GTFS is not a graph — it's a relational dataset. We transform it server-si
 
 ```mermaid
 flowchart LR
-    A[stops.txt] --> P
-    B[stop_times.txt] --> P
-    C[trips.txt] --> P
-    D[routes.txt] --> P
-    E[fare_attributes.txt] --> P
-    P[Stream Preprocessor] --> G[graph_edges.json]
-    P --> S[optimized_stops.json]
-    P --> R[optimized_routes.json]
-    P --> F[optimized_fares.json]
+    A["stops.txt"] --> P
+    B["stop_times.txt"] --> P
+    C["trips.txt"] --> P
+    D["routes.txt"] --> P
+    E["fare_attributes.txt"] --> P
+    P["Stream Preprocessor"] --> G["graph_edges.json"]
+    P --> S["optimized_stops.json"]
+    P --> R["optimized_routes.json"]
+    P --> F["optimized_fares.json"]
     G --> API
     S --> API
     R --> API
@@ -240,13 +240,13 @@ Total cold-start load time: **< 800ms** for both Metro and Bus stores combined.
 
 ```mermaid
 flowchart LR
-    OTD[OTD Realtime API\nVehiclePositions.pb] -->|Binary Protobuf| Decode
-    Decode[GtfsRealtimeBindings.decode] -->|FeedMessage| Filter
-    Filter{Route ID\nin MetroSet?} -->|Yes| Metro[Metro Vehicles]
-    Filter -->|No| Bus[Bus Vehicles]
-    Metro --> Cache[15s TTL Cache]
-    Cache --> ETA[ETA Approximation]
-    ETA --> API[/api/metro/arrivals/:id]
+    OTD["OTD Realtime API\nVehiclePositions.pb"] -->|"Binary Protobuf"| Decode
+    Decode["GtfsRealtimeBindings.decode"] -->|"FeedMessage"| Filter
+    Filter{"Route ID in MetroSet?"} -->|"Yes"| Metro["Metro Vehicles"]
+    Filter -->|"No"| Bus["Bus Vehicles"]
+    Metro --> Cache["15s TTL Cache"]
+    Cache --> ETA["ETA Approximation"]
+    ETA --> ARRIVALS["/api/metro/arrivals/:id"]
 ```
 
 **ETA Approximation Model:**
@@ -293,19 +293,20 @@ Every realtime endpoint has a deterministic fallback. If OTD is unreachable, we 
 
 ```mermaid
 flowchart TD
-    SVGFile[/public/maps/dmrc-map.svg] --> Fetch
-    Fetch[useEffect fetch on mount] --> Parse[DOMParser]
-    Parse --> Extract[Extract tspan coords\nfor station matching]
-    Extract --> Store[stationCoords Map]
+    SVGFile["\"/public/maps/dmrc-map.svg\""] --> Fetch
+    Fetch["useEffect fetch on mount"] --> Parse["DOMParser"]
+    Parse --> Extract["Extract tspan coords for station matching"]
+    Extract --> StationMap["stationCoords Map"]
 
-    FramerMotion --> Pan[drag + dragConstraints]
-    FramerMotion --> Zoom[scale motion value]
-    Pan --> Constraint[useLayoutEffect\nboundary recalculation]
+    FramerMotion["Framer Motion"] --> Pan["drag + dragConstraints"]
+    FramerMotion --> Zoom["scale motion value"]
+    Pan --> Constraint["useLayoutEffect boundary recalculation"]
     Zoom --> Constraint
 
-    Store --> Overlay[SVG overlay layer\nwith route highlight]
-    Overlay --> PathAnim[motion.path pathLength\nanimation on route select]
+    StationMap --> Overlay["SVG overlay layer with route highlight"]
+    Overlay --> PathAnim["motion.path pathLength animation on route select"]
 ```
+
 
 **Strict Boundary Enforcement:**
 We use direct `MotionValue` manipulation (not spring physics) to enforce rigid frame-locked boundaries. The constraint rect recalculates on every zoom change via `useLayoutEffect`, ensuring the map never "disappears" regardless of device size.
@@ -409,11 +410,12 @@ location /api/ {
 
 ```mermaid
 graph LR
-    A[Phase 1\nSingle EC2\nPM2 Cluster] --> B
-    B[Phase 2\nRedis Cache\nShared Feed State] --> C
-    C[Phase 3\nDocker + ECS\nAuto-scaling] --> D
-    D[Phase 4\nKubernetes\nHPA + VPA]
+    A["Phase 1: Single EC2 + PM2 Cluster"] --> B
+    B["Phase 2: Redis Cache + Shared Feed State"] --> C
+    C["Phase 3: Docker + ECS Auto-scaling"] --> D
+    D["Phase 4: Kubernetes HPA + VPA"]
 ```
+
 
 ---
 
