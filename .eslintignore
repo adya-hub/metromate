@@ -1,0 +1,7 @@
+# Ignore backend and design_assets from ESLint (deployed separately)
+backend/**
+design_assets/**
+node_modules/**
+.next/**
+dist/**
+build/**

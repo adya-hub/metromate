@@ -1,0 +1,12 @@
+# Exclude backend from Vercel deployments
+# The backend is a separate Express server deployed to AWS EC2
+backend/
+design_assets/
+
+# Exclude other non-frontend assets
+screenshots/
+deployment/
+metro-gtfs/
+gtfs/
+*.pb
+*.log
