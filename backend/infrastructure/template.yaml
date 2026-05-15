@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Delhi Metro Transit Backend Infrastructure
+
+Resources:
+  StationsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: metro-stations
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  GetStationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../lambda/get-stations/
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /stations
+            Method: get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref StationsTable
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
