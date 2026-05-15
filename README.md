@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚇 MetroMate
+<img src="./screenshots/logo.png" alt="MetroMate Logo" width="320" />
 
 ### Realtime Urban Mobility Intelligence Platform
 

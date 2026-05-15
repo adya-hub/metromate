@@ -27,18 +27,21 @@ export function Navbar({ onSettingsClick }: NavbarProps) {
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <motion.div
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center shadow-lg shadow-violet-500/50"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center"
             >
-              <span className="text-white font-bold text-xl">M</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png"
+                alt="MetroMate Logo"
+                className="h-10 w-auto dark:brightness-[1.15] dark:contrast-[1.1]"
+              />
             </motion.div>
-            <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
-              MetroMate
-            </span>
           </div>
+
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
