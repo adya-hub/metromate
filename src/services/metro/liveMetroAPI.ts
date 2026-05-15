@@ -8,7 +8,7 @@
  * The UI must handle null gracefully and fall back to GTFS data.
  */
 
-const BACKEND = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+const BACKEND = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 // ------------------------------------------------------------------------------
 // Types (mirrors backend responses)

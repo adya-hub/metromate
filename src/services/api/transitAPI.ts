@@ -5,7 +5,7 @@
  */
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+  process.env.NEXT_PUBLIC_API_URL ?? "";
 
 // ------------------------------------------------------------------------------
 // Types (mirrors backend responses)
